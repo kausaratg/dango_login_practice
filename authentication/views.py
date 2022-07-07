@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from ast import Not
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -12,38 +12,37 @@ def index(request):
     return render(request, 'authentication/index.html')
 
 def signup(request):
-    if request.method =='POST':
-        username = request.POST['username']
-        f_name = request.POST['fname']
-        l_name = request.POST['lname']
+    if request.method == "POST":
+        user_name = request.POST['username']
+        first_name = request.POST['fname']
+        last_name = request.POST['lname']
         email = request.POST['email']
-        pass1 = request.POST['pass1']
-        pass2 = request.POST['pass2']
-        myuser = User.objects.create(username=username, email=email, password=pass1)
-        myuser.first_name = f_name
-        myuser.last_name = l_name
-        myuser.save()
-        messages.success(request, "Your Account has been successfully created.")
-        return redirect('signin')
-
-
+        password = request.POST['pass1']
+        password2 = request.POST['pass2']
+        if password == password2:
+            user = User.objects.create_user(username=user_name, email=email, password=password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            return redirect('signin')
+        else:
+            messages.info(request, 'password does not match')
+            return redirect('signup')
     else:
         return render(request, 'authentication/signup.html')
 
 def signin(request):
-    if request.method == "POST":
-        username = request.POST['username']
-        pass1 = request.POST['pass1']
-        user = authenticate(Username=username, Password=pass1)
-        if user is not None:
-            login(request, user)
+    if request.method == 'POST':
+        user_name = request.POST['username']
+        password = request.POST['pass1']
+        user_check = authenticate(username=user_name, password=password)
+        if user_check is not None:
+            login(request, user_check)
             f_name = User.first_name
-            note = f'Welcome {f_name}'
-            return redirect('/')
+            return render(request, 'authentication/index.html', {'f_name':f_name})
         else:
-            messages.error(request, 'Bad credentials')
-            return redirect ('signin')
-            
+            messages.info(request, 'invalid credentials')
+            return redirect('signin')
     return render(request, 'authentication/signin.html')
 
 def signout(request):

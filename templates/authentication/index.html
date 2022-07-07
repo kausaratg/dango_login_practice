@@ -7,7 +7,12 @@
     <title>authenticaton</title>
 </head>
 <body>
+    
     <h2>Welocme to my_practice</h2>
+    {% if user.is_authenticated %}  
+        <h3>Hello {{f_name}}</h3>
+        <h4>You're successfully logged in</h4>
+    {% endif %}
     <button type="submit"><a href="{%url 'signup' %}">signup</a></button>
     <button type="submit"><a href="{%url 'signin' %}">signin</a> </button>
     <button type="submit"> <a href="/signout">signout</a></button>
